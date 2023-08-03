@@ -1,11 +1,15 @@
 import Button from '../button/button.component';
+
 import { useState } from 'react';
+
 import {
   signInWithGooglePopup,
   createUserDocumentFromAuth,
   signInAuthUserWithEmailAndPassword
 } from '../../utils/firebase/firebase.utils';
+
 import FormInput from '../form-input/form-input.component';
+
 import './sign-in-form.styles.scss';
 
 const defaultFormFields = {
@@ -22,8 +26,7 @@ const SignInForm = () => {
   };
 
   const signInWithGoogle = async () => {
-    const {user} = await signInWithGooglePopup();
-    await createUserDocumentFromAuth(user);
+    await signInWithGooglePopup();
   };
 
   const handleChange = (event) => {
@@ -35,10 +38,9 @@ const SignInForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-
     try {
-      const response = await signInAuthUserWithEmailAndPassword(email, password);
-      console.log(response);
+      const {user} = await signInAuthUserWithEmailAndPassword(email, password);
+
       resetFormFields();
     } catch(error) {
       switch(error.code) {
@@ -47,6 +49,9 @@ const SignInForm = () => {
           break;
         case 'auth/user-not-found':
           alert('No user associated with this email');
+          break;
+        case 'auth/popup-closed-by-user':
+          alert('You closed the google sign in page!!');
           break;
         default: 
           console.log(error);
@@ -77,6 +82,7 @@ const SignInForm = () => {
           value={password}
           required
         />
+
         <div className='buttons-container'>
           <Button type="submit">SIGN IN</Button>
           <Button onClick={signInWithGoogle} buttonType='google' type='button'>GOOGLE SIGN IN</Button>
